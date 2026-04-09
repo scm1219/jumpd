@@ -31,12 +31,15 @@ at that location.
 
 USAGE:
   jumpd <drive> [pattern1] [pattern2] ...
+  jumpd -e <drive> [pattern1] [pattern2] ...
 
   The first argument is the drive letter (e.g., "d" or "d:").
   Remaining arguments are directory name patterns matched level by level.
+  Use -e/--explorer to open in Windows Explorer instead of a new CMD window.
 
 EXAMPLES:
-  jumpd d tools            # List dirs containing "tools" under D:\
+  jumpd d tools            # List dirs containing "tools" under D:\, open CMD
+  jumpd -e d tools         # Same, but open in Windows Explorer
   jumpd d tools pickyou    # List dirs containing "pickyou" under D:\*tools*\
 
 INTERACTIVE CONTROLS:

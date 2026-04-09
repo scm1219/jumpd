@@ -22,25 +22,25 @@ go build -o jumpd.exe .
 
 ```
 jumpd <drive> [pattern1] [pattern2] ...
+jumpd [flags] <drive> [pattern1] [pattern2] ...
 ```
 
 - 第一个参数为盘符（支持 `d` 或 `d:` 格式）
 - 后续参数为目录名模糊匹配词，按层级逐级匹配（不区分大小写）
+- `-e` 可出现在任意位置
 
 ### 示例
 
 ```bash
-# 搜索 D 盘下名称包含 "tools" 的目录
+# 搜索 D 盘下名称包含 "tools" 的目录，选择后打开新 CMD 窗口
 jumpd d tools
-# 输出：
-#   1. D:\work_tools
-#   2. D:\ark_tools
+
+# 使用 -e，选择后用 Windows 资源管理器打开目录（两种写法等价）
+jumpd -e d tools
+jumpd d tools -e
 
 # 多级匹配：D 盘下 tools 目录中包含 "pickyou" 的子目录
 jumpd d tools pickyou
-# 输出：
-#   1. D:\work_tools\pickyou
-#   2. D:\ark_tools\old_pickyou
 ```
 
 ### 交互控制
@@ -57,7 +57,8 @@ jumpd d tools pickyou
 
 ```
 Flags:
-  -h, --help   显示帮助信息
+  -e, --explorer   用 Windows 资源管理器打开选中目录（默认打开新 CMD 窗口）
+  -h, --help       显示帮助信息
 ```
 
 ## 许可
