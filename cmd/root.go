@@ -17,6 +17,10 @@ import (
 // In this mode, the selected path is written to a temp file instead of opening a new window.
 var wrapperMode bool
 
+// explorerMode is set via -e/--explorer flag.
+// In wrapper mode, opens the selected directory in Windows Explorer instead of cd.
+var explorerMode bool
+
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "jumpd <drive> [pattern1] [pattern2] ...",
@@ -66,7 +70,7 @@ func runJumpd(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(results) == 0 {
-		fmt.Fprintln(cmd.ErrOrStderr(), "No matching directories found.")
+		fmt.Fprintf(cmd.ErrOrStderr(), "No matching directories found under %s:\\ for pattern(s): %s\n", drive, strings.Join(patterns, " > "))
 		return nil
 	}
 
@@ -77,9 +81,15 @@ func runJumpd(cmd *cobra.Command, args []string) error {
 	}
 
 	if wrapperMode {
-		// Write path to temp file, the wrapper CMD will cd to it
-		tmpPath := filepath.Join(os.TempDir(), "jumpd_path.txt")
-		_ = os.WriteFile(tmpPath, []byte(selected), 0644)
+		if explorerMode {
+			// Open Windows Explorer at the selected directory, then exit the CMD
+			c := exec.Command("explorer", selected)
+			_ = c.Start()
+		} else {
+			// Write path to temp file, the wrapper CMD will cd to it
+			tmpPath := filepath.Join(os.TempDir(), "jumpd_path.txt")
+			_ = os.WriteFile(tmpPath, []byte(selected), 0644)
+		}
 		return nil
 	}
 
@@ -93,6 +103,7 @@ func runJumpd(cmd *cobra.Command, args []string) error {
 func Execute() {
 	rootCmd.Flags().BoolVar(&wrapperMode, "wrapper", false, "internal: wrapper mode for cmd integration")
 	_ = rootCmd.Flags().MarkHidden("wrapper")
+	rootCmd.Flags().BoolVarP(&explorerMode, "explorer", "e", false, "open selected directory in Windows Explorer")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
