@@ -36,10 +36,11 @@ EXAMPLES:
   jumpd d tools pickyou    # List dirs containing "pickyou" under D:\*tools*\
 
 INTERACTIVE CONTROLS:
-  1-9    Select directory by index (opens new CMD window)
-  n/N    Next page
-  p/P    Previous page
-  q/Q    Quit
+  ← →    Previous / Next page
+  1-9    Select directory by index
+  g+N    Jump to page N (e.g. g3 for page 3)
+  Esc    Cancel page jump input
+  q      Quit
 `,
 	Args: cobra.MinimumNArgs(1),
 	RunE: runJumpd,
