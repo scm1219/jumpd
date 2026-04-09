@@ -13,7 +13,17 @@ go install github.com/scm1219/jumpd@latest
 ```bash
 git clone https://github.com/scm1219/jumpd.git
 cd jumpd
-go build -o jumpd.exe .
+go build -ldflags="-s -w" -o jumpd.exe .
+```
+
+可选：使用 UPX 进一步压缩体积（约 3.9M → 2.7M → 1M）：
+
+```bash
+# 安装 UPX
+winget install upx
+
+# 压缩（重新打开终端使 PATH 生效后执行）
+upx --best jumpd.exe
 ```
 
 将 `jumpd.exe` 放入 PATH 目录即可。
