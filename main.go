@@ -40,7 +40,7 @@ func main() {
 	args := os.Args[1:]
 	// Use %%%%i in Sprintf to produce %%i in the bat file (Go %% -> %, so %%%% -> %%)
 	bat := fmt.Sprintf(
-		"@echo off\r\n\"%s\" --wrapper %s\r\nif exist \"%s\" (for /f \"usebackq\" %%%%i in (\"%s\") do cd /d \"%%%%i\") else exit\r\n",
+		"@echo off\r\n\"%s\" --wrapper %s\r\nif exist \"%s\" (for /f \"usebackq\" %%%%i in (\"%s\") do (cd /d \"%%%%i\" & for %%%%j in (\"%%%%~nxi\") do title %%%%j & cls)) else exit\r\n",
 		exe, strings.Join(args, " "), tmpPath, tmpPath,
 	)
 	if err := os.WriteFile(tmpBat, []byte(bat), 0644); err != nil {

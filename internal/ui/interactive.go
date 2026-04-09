@@ -27,6 +27,7 @@ const (
 	vkReturn = 0x0D
 	vkEscape = 0x1B
 	vkBack   = 0x08
+	vkC      = 0x43
 )
 
 // Windows console input types
@@ -57,6 +58,8 @@ var (
 	procSetConsoleMode         = kernel32.NewProc("SetConsoleMode")
 	procReadConsoleInputW      = kernel32.NewProc("ReadConsoleInputW")
 )
+
+const ctrlPressed uint32 = 0x0008
 
 const stdInputHandle = ^uintptr(9) // -10
 
@@ -106,6 +109,11 @@ func SelectPath(paths []string) string {
 		ke, ok := readKeyEvent(stdin)
 		if !ok || ke.KeyDown == 0 {
 			continue
+		}
+
+		// Ctrl+C: quit immediately
+		if ke.VirtualKeyCode == vkC && ke.ControlKeyState&ctrlPressed != 0 {
+			return ""
 		}
 
 		ch := string(rune(ke.Char))
