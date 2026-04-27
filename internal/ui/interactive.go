@@ -23,7 +23,11 @@ const (
 // Virtual key codes
 const (
 	vkLeft   = 0x25
+	vkUp     = 0x26
 	vkRight  = 0x27
+	vkDown   = 0x28
+	vkHome   = 0x24
+	vkEnd    = 0x23
 	vkReturn = 0x0D
 	vkEscape = 0x1B
 	vkBack   = 0x08
@@ -103,7 +107,7 @@ func SelectPath(paths []string) string {
 		if jumpMode {
 			fmt.Printf("\n  Jump to page [%s_]: ", jumpBuf.String())
 		} else {
-			fmt.Print("\n  [← → page | 1-9 select | g jump | q quit]: ")
+			fmt.Print("\n  [← ↑ → ↓ page | Home/End | 1-9 select | g jump | q quit]: ")
 		}
 
 		ke, ok := readKeyEvent(stdin)
@@ -124,15 +128,25 @@ func SelectPath(paths []string) string {
 		}
 
 		switch {
-		case ke.VirtualKeyCode == vkLeft:
+		case ke.VirtualKeyCode == vkLeft, ke.VirtualKeyCode == vkUp:
 			if page > 0 {
 				page--
+			} else {
+				page = totalPages - 1
 			}
 
-		case ke.VirtualKeyCode == vkRight:
+		case ke.VirtualKeyCode == vkRight, ke.VirtualKeyCode == vkDown:
 			if page < totalPages-1 {
 				page++
+			} else {
+				page = 0
 			}
+
+		case ke.VirtualKeyCode == vkHome:
+			page = 0
+
+		case ke.VirtualKeyCode == vkEnd:
+			page = totalPages - 1
 
 		case ch == "q" || ch == "Q":
 			return ""
@@ -246,7 +260,7 @@ func selectPathFallback(paths []string) string {
 	for {
 		displayPage(paths, page, totalPages)
 
-		fmt.Print("\nEnter choice [1-9/n/p/q]: ")
+		fmt.Print("\nEnter choice [1-9/n/p/home/end/q]: ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "\nInput error:", err)
@@ -265,6 +279,8 @@ func selectPathFallback(paths []string) string {
 		if strings.EqualFold(choice, "n") || strings.EqualFold(choice, "next") {
 			if page < totalPages-1 {
 				page++
+			} else {
+				page = 0
 			}
 			continue
 		}
@@ -272,13 +288,25 @@ func selectPathFallback(paths []string) string {
 		if strings.EqualFold(choice, "p") || strings.EqualFold(choice, "prev") {
 			if page > 0 {
 				page--
+			} else {
+				page = totalPages - 1
 			}
+			continue
+		}
+
+		if strings.EqualFold(choice, "home") {
+			page = 0
+			continue
+		}
+
+		if strings.EqualFold(choice, "end") {
+			page = totalPages - 1
 			continue
 		}
 
 		num, err := strconv.Atoi(choice)
 		if err != nil || num < 1 || num > pageSize {
-			fmt.Fprintln(os.Stderr, "Invalid input. Enter 1-9, n (next), p (prev), or q (quit).")
+			fmt.Fprintln(os.Stderr, "Invalid input. Enter 1-9, n (next), p (prev), home, end, or q (quit).")
 			continue
 		}
 
